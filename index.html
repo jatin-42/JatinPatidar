@@ -402,7 +402,9 @@
                     card.classList.add('project-card', 'relative', 'rounded-xl', 'overflow-hidden', 'bg-card-bg', 'shadow-lg', 'cursor-pointer', 'reveal-item');
                     card.style.transitionDelay = `${index * 0.1}s`;
                     card.innerHTML = `
-                        <img src="${project.image}" alt="${project.title}" class="w-full h-auto object-cover">
+                        <div class="h-48 overflow-hidden">
+                            <img src="${project.image}" alt="${project.title}" class="w-full h-full object-cover">
+                        </div>
                         <div class="p-6">
                             <h3 class="font-bold text-xl mb-2 text-white">${project.title}</h3>
                             <p class="text-sm text-gray-400">${project.summary}</p>
