@@ -11,11 +11,11 @@
 
     <style>
         :root {
-            --bg: #0d1117;
+            --bg: #0b0d11; /* Slightly darker for the network to pop */
             --text: #c9d1d9;
             --heading: #ffffff;
             --accent: #58a6ff;
-            --card-bg: #161b22;
+            --card-bg: rgba(22, 27, 34, 0.7);
             --border: #30363d;
             --sidebar-width: 500px;
         }
@@ -33,55 +33,13 @@
             min-height: 100vh;
         }
 
-        /* --- OPTION 3: STARFIELD BACKGROUND ANIMATION --- */
-        /* This creates 3 layers of stars moving at different speeds */
-        
-        .stars-container {
+        /* --- BACKGROUND CANVAS (The Neural Network) --- */
+        #canvas-network {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
-            pointer-events: none;
-            overflow: hidden;
-            background: linear-gradient(to bottom, #0d1117 0%, #05070a 100%);
-        }
-
-        .star {
-            position: absolute;
-            width: 2px; height: 2px;
-            background: white;
-            border-radius: 50%;
-            opacity: 0.5;
-            animation: moveUp linear infinite;
-        }
-
-        /* Creating random stars using box-shadow to avoid 100s of divs */
-        /* This is a performance hack for starfields */
-        .stars-1 {
-            width: 1px; height: 1px;
-            background: transparent;
-            box-shadow: 12vw 14vh #fff, 83vw 22vh #fff, 45vw 67vh #fff, 12vw 88vh #fff, 
-                        67vw 12vh #fff, 88vw 88vh #fff, 34vw 45vh #fff, 22vw 12vh #fff,
-                        91vw 34vh #fff, 15vw 72vh #fff, 55vw 22vh #fff, 72vw 45vh #fff,
-                        10vw 90vh #fff, 50vw 50vh #fff, 90vw 10vh #fff;
-            animation: moveStars 100s linear infinite;
-        }
-        .stars-2 {
-            width: 2px; height: 2px;
-            background: transparent;
-            box-shadow: 22vw 34vh #8b949e, 63vw 12vh #8b949e, 15vw 57vh #8b949e, 
-                        72vw 78vh #8b949e, 85vw 22vh #8b949e, 44vw 45vh #8b949e;
-            animation: moveStars 150s linear infinite;
-        }
-        .stars-3 {
-            width: 3px; height: 3px;
-            background: transparent;
-            box-shadow: 12vw 54vh #58a6ff, 53vw 82vh #58a6ff, 85vw 17vh #58a6ff;
-            animation: moveStars 200s linear infinite;
-        }
-
-        @keyframes moveStars {
-            from { transform: translateY(0); }
-            to { transform: translateY(-2000px); }
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1; /* Behind everything */
+            background: radial-gradient(circle at center, #161b22 0%, #0b0d11 100%);
         }
 
         /* --- MAIN WRAPPER FOR SLIDE EFFECT --- */
@@ -96,9 +54,9 @@
             pointer-events: none;
         }
 
-        /* --- NAVIGATION (Absolute = Scrolls Away) --- */
+        /* --- NAVIGATION (Scrolls Away) --- */
         nav {
-            position: absolute; /* Not fixed, so it scrolls away */
+            position: absolute;
             top: 0; left: 0; width: 100%;
             background: transparent;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -146,7 +104,7 @@
             color: var(--heading);
             font-weight: 800;
             letter-spacing: -2px;
-            text-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+            text-shadow: 0 0 30px rgba(88, 166, 255, 0.2);
         }
         .subtitle {
             font-size: 1.6rem;
@@ -175,7 +133,7 @@
             font-weight: 600;
             transition: all 0.2s;
             cursor: pointer;
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(10px);
         }
         .btn.primary { 
             background-color: var(--accent); 
@@ -204,7 +162,7 @@
         }
         
         .project-card {
-            background-color: rgba(22, 27, 34, 0.6); /* Semi-transparent */
+            background-color: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: 16px;
             padding: 30px;
@@ -214,7 +172,7 @@
             display: flex;
             flex-direction: column;
             min-height: 240px;
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(10px); /* Glass effect */
         }
         
         .project-card:hover {
@@ -229,6 +187,9 @@
             font-weight: 700;
             color: var(--heading);
             margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
         
         .project-preview {
@@ -312,7 +273,7 @@
             justify-content: center;
         }
         .skill-item {
-            background-color: rgba(22, 27, 34, 0.6);
+            background-color: var(--card-bg);
             border: 1px solid var(--border);
             padding: 12px 24px;
             border-radius: 100px;
@@ -320,6 +281,7 @@
             color: var(--text);
             transition: all 0.2s;
             cursor: default;
+            backdrop-filter: blur(5px);
         }
         .skill-item:hover {
             border-color: var(--accent);
@@ -329,7 +291,7 @@
             box-shadow: 0 5px 15px rgba(88, 166, 255, 0.1);
         }
 
-        /* --- CONTACT (Clean - No Box) --- */
+        /* --- CONTACT --- */
         #contact {
             text-align: center;
             padding-bottom: 40px;
@@ -340,7 +302,7 @@
             margin-bottom: 40px;
         }
 
-        /* --- FOOTER (Minimal) --- */
+        /* --- FOOTER --- */
         footer {
             text-align: center;
             padding: 50px 0;
@@ -356,17 +318,13 @@
             :root { --sidebar-width: 100%; }
             body.sidebar-active .main-wrapper { transform: scale(0.9); }
             h1 { font-size: 2.5rem; }
-            .nav-links { display: none; } /* Could add mobile menu later if needed */
+            .nav-links { display: none; } 
         }
     </style>
 </head>
 <body>
 
-    <div class="stars-container">
-        <div class="stars-1"></div>
-        <div class="stars-2"></div>
-        <div class="stars-3"></div>
-    </div>
+    <canvas id="canvas-network"></canvas>
 
     <div id="project-sidebar">
         <div class="sidebar-header">
@@ -429,7 +387,10 @@ Key analyses included calculating Customer Lifetime Value (CLV) to identify VIP 
                          data-link="https://github.com/jatin-42/music-store-sql-analysis"
                          data-tags="SQL,Docker,Schema Design,BI">
                         
-                        <div class="project-title">📊 End-to-End Digital Music Store Analysis</div>
+                        <div class="project-title">
+                            <i class="fas fa-music" style="color: var(--accent);"></i>
+                            End-to-End Digital Music Store Analysis
+                        </div>
                         <p class="project-preview">Designed and deployed a local data analysis environment using Docker and MySQL. Performed complex SQL queries to extract business insights regarding customer lifetime value...</p>
                         <div class="tags">
                             <span class="tag">SQL</span>
@@ -446,7 +407,10 @@ I developed an automated ETL process to clean and preprocess raw customer data. 
                          data-link="https://github.com/jatin-42/Customer-churn-prediction"
                          data-tags="Python,Docker,AWS,Machine Learning">
                         
-                        <div class="project-title">🏗️ End-to-End Churn Prediction</div>
+                        <div class="project-title">
+                            <i class="fas fa-server" style="color: #e27d60;"></i>
+                            End-to-End Churn Prediction
+                        </div>
                         <p class="project-preview">A full-stack ML pipeline that predicts customer churn. Features an automated ETL process, model training, and a scalable API deployment using AWS EC2...</p>
                         <div class="tags">
                             <span class="tag">Python</span>
@@ -463,7 +427,10 @@ The system first constructs a 'Scene Graph' to understand the semantic relations
                          data-link="https://github.com/jatin-42/image-captioning-gcn-rnn"
                          data-tags="Python,GCN,LSTM,Deep Learning">
                         
-                        <div class="project-title">🕸️ GCN Image Captioning</div>
+                        <div class="project-title">
+                            <i class="fas fa-brain" style="color: #c38d9e;"></i>
+                            GCN Image Captioning
+                        </div>
                         <p class="project-preview">An advanced AI system that generates natural language captions. Uses Graph Neural Networks to understand object relationships...</p>
                         <div class="tags">
                             <span class="tag">Python</span>
@@ -479,7 +446,10 @@ It also features detailed visualizations created with Matplotlib and Seaborn to 
                          data-link="https://github.com/jatin-42/Data-Engineering-Portfolio"
                          data-tags="SQL,Pandas,Matplotlib,EDA">
                         
-                        <div class="project-title">📊 Data Analysis Portfolio</div>
+                        <div class="project-title">
+                            <i class="fas fa-chart-pie" style="color: #85dcba;"></i>
+                            Data Analysis Portfolio
+                        </div>
                         <p class="project-preview">A collection of SQL queries, Python EDA notebooks, and data visualizations demonstrating statistical analysis skills...</p>
                         <div class="tags">
                             <span class="tag">SQL</span>
@@ -529,18 +499,15 @@ It also features detailed visualizations created with Matplotlib and Seaborn to 
 
     <script>
         function openSidebar(element) {
-            // Retrieve data from the clicked card
             const title = element.getAttribute('data-title');
             const desc = element.getAttribute('data-desc');
             const link = element.getAttribute('data-link');
             const tags = element.getAttribute('data-tags').split(',');
 
-            // Inject data into sidebar
             document.getElementById('sidebar-title').textContent = title;
             document.getElementById('sidebar-desc').textContent = desc;
             document.getElementById('sidebar-link').href = link;
 
-            // Generate tags
             const tagsContainer = document.getElementById('sidebar-tags');
             tagsContainer.innerHTML = '';
             tags.forEach(tag => {
@@ -550,13 +517,123 @@ It also features detailed visualizations created with Matplotlib and Seaborn to 
                 tagsContainer.appendChild(span);
             });
 
-            // Show Sidebar
             document.body.classList.add('sidebar-active');
         }
 
         function closeSidebar() {
             document.body.classList.remove('sidebar-active');
         }
+    </script>
+
+    <script>
+        const canvas = document.getElementById('canvas-network');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let particles = [];
+        
+        // Configuration
+        const particleCount = 60; // Number of nodes
+        const connectionDistance = 150; // Distance to connect lines
+        const mouseDistance = 200; // Mouse interaction range
+
+        // Mouse tracking
+        const mouse = { x: null, y: null };
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.x;
+            mouse.y = e.y;
+        });
+        window.addEventListener('mouseout', () => {
+            mouse.x = null;
+            mouse.y = null;
+        });
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 1.5; // Velocity X
+                this.vy = (Math.random() - 0.5) * 1.5; // Velocity Y
+                this.size = Math.random() * 2 + 1;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Bounce off edges
+                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+
+                // Mouse Interaction (Push effect)
+                if (mouse.x != null) {
+                    let dx = mouse.x - this.x;
+                    let dy = mouse.y - this.y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < mouseDistance) {
+                        const forceDirectionX = dx / distance;
+                        const forceDirectionY = dy / distance;
+                        const force = (mouseDistance - distance) / mouseDistance;
+                        const directionX = forceDirectionX * force * 3; // Push strength
+                        const directionY = forceDirectionY * force * 3;
+                        
+                        this.x -= directionX;
+                        this.y -= directionY;
+                    }
+                }
+            }
+
+            draw() {
+                ctx.fillStyle = 'rgba(88, 166, 255, 0.7)';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function init() {
+            particles = [];
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+
+                // Draw Connections
+                for (let j = i; j < particles.length; j++) {
+                    let dx = particles[i].x - particles[j].x;
+                    let dy = particles[i].y - particles[j].y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < connectionDistance) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(88, 166, 255, ${1 - distance/connectionDistance})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+
+        // Handle Resize
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            init();
+        });
+
+        init();
+        animate();
     </script>
 
 </body>
