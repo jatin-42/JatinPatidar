@@ -19,7 +19,6 @@
             --card-bg: #161b22;
             --border: #30363d;
             --nav-bg: rgba(13, 17, 23, 0.85);
-            --sidebar-width: 450px;
         }
         
         * { box-sizing: border-box; }
@@ -31,22 +30,21 @@
             margin: 0;
             padding: 0;
             line-height: 1.6;
-            overflow-x: hidden; /* Prevent horizontal scroll when pushing content */
         }
 
-        /* --- WRAPPER FOR ANIMATION EFFECT --- */
-        /* This wraps the whole site so we can push it away when sidebar opens */
-        .main-wrapper {
-            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s;
-            transform-origin: left center;
+        /* --- ANIMATIONS --- */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        
-        /* State when sidebar is open */
-        body.sidebar-active .main-wrapper {
-            transform: translateX(-100px) scale(0.95);
-            opacity: 0.4;
-            pointer-events: none; /* Prevent clicking background */
+
+        .animate-load {
+            animation: fadeInUp 0.8s ease-out forwards;
+            opacity: 0;
         }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.3s; }
+        .delay-3 { animation-delay: 0.5s; }
 
         /* --- NAVIGATION --- */
         nav {
@@ -55,7 +53,7 @@
             background: var(--nav-bg);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--border);
-            z-index: 100;
+            z-index: 1000;
             padding: 15px 0;
         }
         .nav-container {
@@ -126,7 +124,7 @@
         .btn.primary { background-color: var(--accent); border-color: var(--accent); color: white; }
         .btn:hover { transform: translateY(-2px); opacity: 0.9; }
 
-        /* --- PROJECTS GRID --- */
+        /* --- PROJECTS GRID WITH EXPANSION LOGIC --- */
         section { margin-top: 100px; }
         h2 {
             color: var(--heading);
@@ -141,6 +139,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 25px;
+            align-items: start; /* Prevents stretching */
         }
         
         .project-card {
@@ -148,19 +147,31 @@
             border: 1px solid var(--border);
             border-radius: 12px;
             padding: 25px;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             position: relative;
-            cursor: pointer; /* Indicates it's clickable */
+            cursor: pointer;
             display: flex;
             flex-direction: column;
-            min-height: 200px;
+            min-height: 220px;
         }
         
-        .project-card:hover {
+        /* Hover Effect (Only applies if NOT expanded) */
+        .project-card:not(.expanded):hover {
             transform: translateY(-7px);
             border-color: var(--accent);
             background-color: #1c2128;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* --- THE EXPANDED STATE (The "Little Window Opens") --- */
+        .project-card.expanded {
+            grid-column: 1 / -1; /* This forces the card to take the FULL WIDTH of the row */
+            background-color: #1c2128;
+            border-color: var(--accent);
+            cursor: default;
+            transform: scale(1.02);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            z-index: 10;
         }
 
         .project-title {
@@ -168,18 +179,51 @@
             font-weight: 700;
             color: var(--heading);
             margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        
-        /* Truncate text for the card view */
-        .project-preview {
+
+        /* The expansion icon */
+        .expand-icon {
+            font-size: 0.9rem;
+            color: var(--accent);
+            transition: transform 0.3s;
+        }
+        .project-card.expanded .expand-icon { transform: rotate(180deg); }
+
+        /* Description Handling */
+        .project-desc {
             color: #c9d1d9;
             margin-bottom: 20px;
+            line-height: 1.7;
+        }
+        
+        /* By default, clamp text to 3 lines */
+        .project-desc.clamped {
             display: -webkit-box;
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
-            font-size: 0.95rem;
         }
+        
+        /* When expanded, show ALL text */
+        .project-card.expanded .project-desc.clamped {
+            -webkit-line-clamp: unset;
+            display: block;
+        }
+
+        /* Hidden details that appear on click */
+        .expanded-details {
+            display: none; /* Hidden by default */
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            animation: fadeIn 0.5s;
+        }
+        .project-card.expanded .expanded-details { display: block; } /* Show when expanded */
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         .tags { margin-top: auto; display: flex; flex-wrap: wrap; gap: 8px; }
         .tag {
@@ -191,45 +235,6 @@
             font-weight: 600;
             border: 1px solid rgba(88, 166, 255, 0.2);
         }
-
-        /* --- THE SLIDING SIDEBAR WINDOW --- */
-        #project-sidebar {
-            position: fixed;
-            top: 0;
-            right: -600px; /* Hidden by default */
-            width: var(--sidebar-width);
-            height: 100vh;
-            background: #1c2128;
-            border-left: 1px solid var(--border);
-            z-index: 200;
-            padding: 40px;
-            transition: right 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-            box-shadow: -10px 0 30px rgba(0,0,0,0.5);
-            overflow-y: auto;
-        }
-
-        body.sidebar-active #project-sidebar {
-            right: 0; /* Slide in */
-        }
-
-        .sidebar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-            margin-bottom: 30px;
-        }
-        .sidebar-close {
-            background: none;
-            border: none;
-            color: #8b949e;
-            font-size: 1.5rem;
-            cursor: pointer;
-            padding: 5px;
-        }
-        .sidebar-close:hover { color: white; }
-        
-        #sidebar-title { font-size: 1.8rem; color: var(--heading); line-height: 1.2; font-weight: 700; }
-        #sidebar-desc { font-size: 1.05rem; color: #c9d1d9; margin-bottom: 30px; }
 
         /* --- SKILLS GRID --- */
         .skills-grid {
@@ -257,7 +262,7 @@
         }
         .skill-name { font-weight: 600; color: var(--text); }
 
-        /* --- FOOTER --- */
+        /* --- CONTACT & FOOTER --- */
         .contact-box {
             background: var(--card-bg);
             padding: 40px;
@@ -273,222 +278,200 @@
             color: #8b949e;
         }
         a { text-decoration: none; color: inherit; }
-
-        /* Mobile Adjustments */
-        @media (max-width: 768px) {
-            :root { --sidebar-width: 100%; }
-            body.sidebar-active .main-wrapper { transform: scale(0.9); }
-        }
     </style>
 </head>
 <body>
 
-    <div id="project-sidebar">
-        <div class="sidebar-header">
-            <h3 id="sidebar-title">Project Title</h3>
-            <button class="sidebar-close" onclick="closeSidebar()"><i class="fas fa-times"></i></button>
+    <nav class="animate-load">
+        <div class="nav-container">
+            <div class="nav-logo">Jatin.</div>
+            <div class="nav-links">
+                <a href="#projects">Projects</a>
+                <a href="#skills">Skills</a>
+                <a href="#contact">Contact</a>
+            </div>
         </div>
-        <div id="sidebar-content">
-            <p id="sidebar-desc">Description goes here...</p>
-            <div id="sidebar-tags" class="tags" style="margin-bottom: 30px;"></div>
-            <a href="#" id="sidebar-link" target="_blank" class="btn primary">
-                <i class="fab fa-github"></i> View Full Code
-            </a>
+    </nav>
+
+    <header id="home">
+        <div class="container">
+            <h1 class="animate-load delay-1">Jatin Patidar</h1>
+            <div class="subtitle animate-load delay-1">AI & Data Engineer</div>
+            <p class="bio animate-load delay-2">
+                A results-driven Engineer proficient in the full data lifecycle: SQL for extraction, Python for modeling,
+                and Cloud Ops for deployment. Passionate about building efficient, scalable, and automated data solutions.
+            </p>
+            <div class="btn-group animate-load delay-3">
+                <a href="#" class="btn primary">
+                    <i class="fas fa-file-alt"></i> Download Resume
+                </a>
+                <a href="https://github.com/jatin-42" class="btn">
+                    <i class="fab fa-github"></i> GitHub
+                </a>
+            </div>
         </div>
+    </header>
+
+    <div class="container">
+        
+        <section id="projects" class="animate-load delay-2">
+            <h2>🚀 Featured Engineering Projects</h2>
+            <div class="projects-grid">
+                
+                <div class="project-card" onclick="toggleProject(this)">
+                    <div class="project-title">
+                        End-to-End Digital Music Store Analysis
+                        <i class="fas fa-chevron-down expand-icon"></i>
+                    </div>
+                    <p class="project-desc clamped">
+                        Designed and deployed a local data analysis environment using Docker and MySQL. Performed complex SQL queries (multi-table joins, subqueries, aggregations) to extract business insights regarding customer lifetime value, global sales trends, and employee performance. Documented the full ETL process and analysis workflow via GitHub.
+                    </p>
+                    <div class="tags">
+                        <span class="tag">SQL</span>
+                        <span class="tag">Docker</span>
+                        <span class="tag">Database Schema Design</span>
+                        <span class="tag">Business Intelligence</span>
+                    </div>
+                    <div class="expanded-details">
+                        <a href="https://github.com/jatin-42/music-store-sql-analysis" target="_blank" class="btn primary">View Repos →</a>
+                    </div>
+                </div>
+
+                <div class="project-card" onclick="toggleProject(this)">
+                    <div class="project-title">
+                        End-to-End Churn Prediction
+                        <i class="fas fa-chevron-down expand-icon"></i>
+                    </div>
+                    <p class="project-desc clamped">
+                        A full-stack ML pipeline that predicts customer churn. Features an automated ETL process, model training, and a scalable API deployment using AWS EC2 and Docker.
+                    </p>
+                    <div class="tags">
+                        <span class="tag">Python</span>
+                        <span class="tag">Docker</span>
+                        <span class="tag">AWS</span>
+                        <span class="tag">Machine Learning</span>
+                    </div>
+                    <div class="expanded-details">
+                        <a href="https://github.com/jatin-42/Customer-churn-prediction" target="_blank" class="btn primary">View Code →</a>
+                    </div>
+                </div>
+
+                <div class="project-card" onclick="toggleProject(this)">
+                    <div class="project-title">
+                        GCN Image Captioning
+                        <i class="fas fa-chevron-down expand-icon"></i>
+                    </div>
+                    <p class="project-desc clamped">
+                        An advanced AI system that generates natural language captions. Uses Graph Neural Networks to understand object relationships (Scene Graphs) + LSTMs for text generation.
+                    </p>
+                    <div class="tags">
+                        <span class="tag">Python</span>
+                        <span class="tag">GCN</span>
+                        <span class="tag">LSTM</span>
+                        <span class="tag">Deep Learning</span>
+                    </div>
+                    <div class="expanded-details">
+                        <a href="https://github.com/jatin-42/image-captioning-gcn-rnn" target="_blank" class="btn primary">View Code →</a>
+                    </div>
+                </div>
+
+                <div class="project-card" onclick="toggleProject(this)">
+                    <div class="project-title">
+                        Data Analysis Portfolio
+                        <i class="fas fa-chevron-down expand-icon"></i>
+                    </div>
+                    <p class="project-desc clamped">
+                        A collection of SQL queries, Python EDA notebooks, and data visualizations demonstrating statistical analysis skills.
+                    </p>
+                    <div class="tags">
+                        <span class="tag">SQL</span>
+                        <span class="tag">Pandas</span>
+                        <span class="tag">Matplotlib</span>
+                        <span class="tag">EDA</span>
+                    </div>
+                    <div class="expanded-details">
+                        <a href="https://github.com/jatin-42/Data-Engineering-Portfolio" target="_blank" class="btn primary">View Repos →</a>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="skills">
+            <h2>🛠️ Technical Stack</h2>
+            <div class="skills-grid">
+                <div class="skill-box">
+                    <i class="devicon-python-plain"></i>
+                    <div class="skill-name">Python</div>
+                </div>
+                <div class="skill-box">
+                    <i class="devicon-mysql-plain"></i>
+                    <div class="skill-name">SQL (MySQL)</div>
+                </div>
+                <div class="skill-box">
+                    <i class="devicon-pandas-plain"></i>
+                    <div class="skill-name">Pandas & NumPy</div>
+                </div>
+                <div class="skill-box">
+                    <i class="fas fa-chart-bar"></i>
+                    <div class="skill-name">Matplotlib</div>
+                </div>
+                <div class="skill-box">
+                    <i class="devicon-docker-plain"></i>
+                    <div class="skill-name">Docker</div>
+                </div>
+                <div class="skill-box">
+                    <i class="devicon-git-plain"></i>
+                    <div class="skill-name">Git & GitHub</div>
+                </div>
+                <div class="skill-box">
+                    <i class="fas fa-brain"></i>
+                    <div class="skill-name">Machine Learning</div>
+                </div>
+                <div class="skill-box">
+                    <i class="fas fa-chart-line"></i>
+                    <div class="skill-name">Data Visualization</div>
+                </div>
+                <div class="skill-box">
+                    <i class="fas fa-database"></i>
+                    <div class="skill-name">OOP & DBMS</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact">
+            <h2>📫 Let's Connect</h2>
+            <div class="contact-box">
+                <p>I am currently open to roles in Data Engineering and AI. Feel free to reach out.</p>
+                <div class="btn-group" style="margin-top: 20px;">
+                    <a href="mailto:jatinpatidar622@gmail.com" class="btn">
+                        <i class="fas fa-envelope"></i> Email Me
+                    </a>
+                    <a href="https://www.linkedin.com/in/jatin-patidar-jatin/" class="btn">
+                        <i class="fab fa-linkedin"></i> LinkedIn
+                    </a>
+                </div>
+            </div>
+        </section>
+
     </div>
 
-    <div class="main-wrapper">
+    <footer>
+        &copy; 2026 Jatin Patidar. Built with pure HTML/CSS.
+    </footer>
 
-        <nav>
-            <div class="nav-container">
-                <div class="nav-logo">Jatin.</div>
-                <div class="nav-links">
-                    <a href="#projects">Projects</a>
-                    <a href="#skills">Skills</a>
-                    <a href="#contact">Contact</a>
-                </div>
-            </div>
-        </nav>
-
-        <header id="home">
-            <div class="container">
-                <h1>Jatin Patidar</h1>
-                <div class="subtitle">AI & Data Engineer</div>
-                <p class="bio">
-                    A results-driven Engineer proficient in the full data lifecycle: SQL for extraction, Python for modeling,
-                    and Cloud Ops for deployment. Passionate about building efficient, scalable, and automated data solutions.
-                </p>
-                <div class="btn-group">
-                    <a href="#" class="btn primary">
-                        <i class="fas fa-file-alt"></i> Download Resume
-                    </a>
-                    <a href="https://github.com/jatin-42" class="btn">
-                        <i class="fab fa-github"></i> GitHub
-                    </a>
-                </div>
-            </div>
-        </header>
-
-        <div class="container">
-            
-            <section id="projects">
-                <h2>🚀 Featured Engineering Projects</h2>
-                <div class="projects-grid">
-                    
-                    <div class="project-card" onclick="openSidebar(this)"
-                         data-title="End-to-End Digital Music Store Analysis"
-                         data-desc="Designed and deployed a local data analysis environment using Docker and MySQL. Performed complex SQL queries (multi-table joins, subqueries, aggregations) to extract business insights regarding customer lifetime value, global sales trends, and employee performance. Documented the full ETL process and analysis workflow via GitHub."
-                         data-link="https://github.com/jatin-42/music-store-sql-analysis"
-                         data-tags="SQL,Docker,Schema Design,BI">
-                        
-                        <div class="project-title">📊 End-to-End Digital Music Store Analysis</div>
-                        <p class="project-preview">Designed and deployed a local data analysis environment using Docker and MySQL. Performed complex SQL queries to extract business insights...</p>
-                        <div class="tags">
-                            <span class="tag">SQL</span>
-                            <span class="tag">Docker</span>
-                            <span class="tag">Schema Design</span>
-                        </div>
-                    </div>
-
-                    <div class="project-card" onclick="openSidebar(this)"
-                         data-title="End-to-End Churn Prediction"
-                         data-desc="A full-stack ML pipeline that predicts customer churn. Features an automated ETL process, model training, and a scalable API deployment using AWS EC2 and Docker."
-                         data-link="https://github.com/jatin-42/Customer-churn-prediction"
-                         data-tags="Python,Docker,AWS,Machine Learning">
-                        
-                        <div class="project-title">🏗️ End-to-End Churn Prediction</div>
-                        <p class="project-preview">A full-stack ML pipeline that predicts customer churn. Features an automated ETL process and scalable API deployment using AWS EC2...</p>
-                        <div class="tags">
-                            <span class="tag">Python</span>
-                            <span class="tag">Docker</span>
-                            <span class="tag">AWS</span>
-                        </div>
-                    </div>
-
-                    <div class="project-card" onclick="openSidebar(this)"
-                         data-title="GCN Image Captioning"
-                         data-desc="An advanced AI system that generates natural language captions. Uses Graph Neural Networks to understand object relationships (Scene Graphs) + LSTMs for text generation."
-                         data-link="https://github.com/jatin-42/image-captioning-gcn-rnn"
-                         data-tags="Python,GCN,LSTM,Deep Learning">
-                        
-                        <div class="project-title">🕸️ GCN Image Captioning</div>
-                        <p class="project-preview">An advanced AI system that generates natural language captions. Uses Graph Neural Networks to understand object relationships...</p>
-                        <div class="tags">
-                            <span class="tag">Python</span>
-                            <span class="tag">Deep Learning</span>
-                        </div>
-                    </div>
-
-                    <div class="project-card" onclick="openSidebar(this)"
-                         data-title="Data Analysis Portfolio"
-                         data-desc="A collection of SQL queries, Python EDA notebooks, and data visualizations demonstrating statistical analysis skills."
-                         data-link="https://github.com/jatin-42/Data-Engineering-Portfolio"
-                         data-tags="SQL,Pandas,Matplotlib,EDA">
-                        
-                        <div class="project-title">📊 Data Analysis Portfolio</div>
-                        <p class="project-preview">A collection of SQL queries, Python EDA notebooks, and data visualizations demonstrating statistical analysis skills...</p>
-                        <div class="tags">
-                            <span class="tag">SQL</span>
-                            <span class="tag">Pandas</span>
-                            <span class="tag">EDA</span>
-                        </div>
-                    </div>
-
-                </div>
-            </section>
-
-            <section id="skills">
-                <h2>🛠️ Technical Stack</h2>
-                <div class="skills-grid">
-                    <div class="skill-box">
-                        <i class="devicon-python-plain"></i>
-                        <div class="skill-name">Python</div>
-                    </div>
-                    <div class="skill-box">
-                        <i class="devicon-mysql-plain"></i>
-                        <div class="skill-name">SQL (MySQL)</div>
-                    </div>
-                    <div class="skill-box">
-                        <i class="devicon-pandas-plain"></i>
-                        <div class="skill-name">Pandas & NumPy</div>
-                    </div>
-                    <div class="skill-box">
-                        <i class="fas fa-chart-bar"></i>
-                        <div class="skill-name">Matplotlib</div>
-                    </div>
-                    <div class="skill-box">
-                        <i class="devicon-docker-plain"></i>
-                        <div class="skill-name">Docker</div>
-                    </div>
-                    <div class="skill-box">
-                        <i class="devicon-git-plain"></i>
-                        <div class="skill-name">Git & GitHub</div>
-                    </div>
-                    <div class="skill-box">
-                        <i class="fas fa-brain"></i>
-                        <div class="skill-name">Machine Learning</div>
-                    </div>
-                    <div class="skill-box">
-                        <i class="fas fa-chart-line"></i>
-                        <div class="skill-name">Data Visualization</div>
-                    </div>
-                    <div class="skill-box">
-                        <i class="fas fa-database"></i>
-                        <div class="skill-name">OOP & DBMS</div>
-                    </div>
-                </div>
-            </section>
-
-            <section id="contact">
-                <h2>📫 Let's Connect</h2>
-                <div class="contact-box">
-                    <p>I am currently open to roles in Data Engineering and AI. Feel free to reach out.</p>
-                    <div class="btn-group" style="margin-top: 20px;">
-                        <a href="mailto:jatinpatidar622@gmail.com" class="btn">
-                            <i class="fas fa-envelope"></i> Email Me
-                        </a>
-                        <a href="https://www.linkedin.com/in/jatin-patidar-jatin/" class="btn">
-                            <i class="fab fa-linkedin"></i> LinkedIn
-                        </a>
-                    </div>
-                </div>
-            </section>
-
-        </div>
-
-        <footer>
-            &copy; 2026 Jatin Patidar.
-        </footer>
-
-    </div> <script>
-        function openSidebar(element) {
-            // Get data from the clicked card
-            const title = element.getAttribute('data-title');
-            const desc = element.getAttribute('data-desc');
-            const link = element.getAttribute('data-link');
-            const tags = element.getAttribute('data-tags').split(',');
-
-            // Populate the Sidebar
-            document.getElementById('sidebar-title').textContent = title;
-            document.getElementById('sidebar-desc').textContent = desc;
-            document.getElementById('sidebar-link').href = link;
-
-            // Generate Tags
-            const tagsContainer = document.getElementById('sidebar-tags');
-            tagsContainer.innerHTML = ''; // Clear old tags
-            tags.forEach(tag => {
-                const span = document.createElement('span');
-                span.className = 'tag';
-                span.textContent = tag;
-                tagsContainer.appendChild(span);
+    <script>
+        function toggleProject(card) {
+            // Close any other expanded cards first
+            const allCards = document.querySelectorAll('.project-card');
+            allCards.forEach(c => {
+                if (c !== card) {
+                    c.classList.remove('expanded');
+                }
             });
 
-            // Activate Animation
-            document.body.classList.add('sidebar-active');
-        }
-
-        function closeSidebar() {
-            document.body.classList.remove('sidebar-active');
+            // Toggle the clicked card
+            card.classList.toggle('expanded');
         }
     </script>
 
