@@ -65,4 +65,4 @@ If you want to view or edit the portfolio website source code:
 
 ### 📫 Contact
 * **Email:** [jatinpatidar622@gmail.com](mailto:jatinpatidar622@gmail.com)
-* **LinkedIn:** [jatin-patidar](https://linkedin.com/in/jatin-patidar)
+* **LinkedIn:** [jatin-patidar](https://linkedin.com/in/jatin-patidar-jatin)
