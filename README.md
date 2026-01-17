@@ -1,7 +1,7 @@
 # 📊 Data Analytics & Engineering Portfolio
 ### by Jatin Patidar | AI & Data Engineer
 
-[![Portfolio Website](https://img.shields.io/badge/View_Live_Portfolio_Website-000000?style=for-the-badge&logo=github&logoColor=white)](https://jatin-42.github.io/JatinPatidar/)
+[![Portfolio Website](https://img.shields.io/badge/View_Live_Portfolio_Website-000000?style=for-the-badge&logo=github&logoColor=white)](https://jatin-42.github.io/Data-Engineering-Portfolio/)
 [![LinkedIn](https://img.shields.io/badge/Connect_on_LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/jatin-patidar)
 
 ---
