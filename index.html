@@ -7,7 +7,6 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
@@ -19,6 +18,7 @@
             --card-bg: #161b22;
             --border: #30363d;
             --nav-bg: rgba(13, 17, 23, 0.85);
+            --sidebar-width: 450px;
         }
         
         * { box-sizing: border-box; }
@@ -30,31 +30,34 @@
             margin: 0;
             padding: 0;
             line-height: 1.6;
+            overflow-x: hidden;
+            
+            /* --- DATA GRID BACKGROUND --- */
+            background-image: linear-gradient(rgba(48, 54, 61, 0.2) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(48, 54, 61, 0.2) 1px, transparent 1px);
+            background-size: 50px 50px; /* Size of the grid squares */
         }
 
-        /* --- ANIMATIONS --- */
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* --- MAIN WRAPPER FOR SLIDE EFFECT --- */
+        .main-wrapper {
+            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s;
+            transform-origin: left center;
+        }
+        
+        body.sidebar-active .main-wrapper {
+            transform: translateX(-100px) scale(0.95);
+            opacity: 0.4;
+            pointer-events: none;
         }
 
-        .animate-load {
-            animation: fadeInUp 0.8s ease-out forwards;
-            opacity: 0;
-        }
-        .delay-1 { animation-delay: 0.1s; }
-        .delay-2 { animation-delay: 0.3s; }
-        .delay-3 { animation-delay: 0.5s; }
-
-        /* --- NAVIGATION --- */
+        /* --- NAVIGATION (SCROLLS AWAY) --- */
         nav {
-            position: fixed;
+            position: absolute; /* Changed from fixed so it scrolls away */
             top: 0; left: 0; width: 100%;
-            background: var(--nav-bg);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--border);
-            z-index: 1000;
-            padding: 15px 0;
+            background: transparent; /* Clean look */
+            border-bottom: 1px solid rgba(48, 54, 61, 0.5);
+            z-index: 100;
+            padding: 20px 0;
         }
         .nav-container {
             max-width: 1000px;
@@ -64,11 +67,11 @@
             justify-content: space-between;
             align-items: center;
         }
-        .nav-logo { font-weight: 800; color: var(--heading); font-size: 1.2rem; }
+        .nav-logo { font-weight: 800; color: var(--heading); font-size: 1.4rem; }
         .nav-links a {
             color: var(--text);
             margin-left: 25px;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             font-weight: 500;
             text-decoration: none;
             transition: color 0.2s;
@@ -85,7 +88,8 @@
         header {
             padding: 180px 0 100px 0;
             text-align: center;
-            background: radial-gradient(circle at top, #1f242e 0%, transparent 40%);
+            /* Radial glow to make text pop against the grid */
+            background: radial-gradient(circle at center, rgba(13,17,23,0.8) 0%, rgba(13,17,23,0) 70%);
         }
         h1 {
             font-size: 3.5rem;
@@ -124,7 +128,7 @@
         .btn.primary { background-color: var(--accent); border-color: var(--accent); color: white; }
         .btn:hover { transform: translateY(-2px); opacity: 0.9; }
 
-        /* --- PROJECTS GRID WITH EXPANSION LOGIC --- */
+        /* --- PROJECTS GRID --- */
         section { margin-top: 100px; }
         h2 {
             color: var(--heading);
@@ -139,7 +143,6 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 25px;
-            align-items: start; /* Prevents stretching */
         }
         
         .project-card {
@@ -147,31 +150,19 @@
             border: 1px solid var(--border);
             border-radius: 12px;
             padding: 25px;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            transition: all 0.3s ease;
             position: relative;
             cursor: pointer;
             display: flex;
             flex-direction: column;
-            min-height: 220px;
+            min-height: 200px;
         }
         
-        /* Hover Effect (Only applies if NOT expanded) */
-        .project-card:not(.expanded):hover {
+        .project-card:hover {
             transform: translateY(-7px);
             border-color: var(--accent);
             background-color: #1c2128;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        /* --- THE EXPANDED STATE (The "Little Window Opens") --- */
-        .project-card.expanded {
-            grid-column: 1 / -1; /* This forces the card to take the FULL WIDTH of the row */
-            background-color: #1c2128;
-            border-color: var(--accent);
-            cursor: default;
-            transform: scale(1.02);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-            z-index: 10;
         }
 
         .project-title {
@@ -183,47 +174,16 @@
             justify-content: space-between;
             align-items: center;
         }
-
-        /* The expansion icon */
-        .expand-icon {
-            font-size: 0.9rem;
-            color: var(--accent);
-            transition: transform 0.3s;
-        }
-        .project-card.expanded .expand-icon { transform: rotate(180deg); }
-
-        /* Description Handling */
-        .project-desc {
+        
+        .project-preview {
             color: #c9d1d9;
             margin-bottom: 20px;
-            line-height: 1.7;
-        }
-        
-        /* By default, clamp text to 3 lines */
-        .project-desc.clamped {
             display: -webkit-box;
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
+            font-size: 0.95rem;
         }
-        
-        /* When expanded, show ALL text */
-        .project-card.expanded .project-desc.clamped {
-            -webkit-line-clamp: unset;
-            display: block;
-        }
-
-        /* Hidden details that appear on click */
-        .expanded-details {
-            display: none; /* Hidden by default */
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid var(--border);
-            animation: fadeIn 0.5s;
-        }
-        .project-card.expanded .expanded-details { display: block; } /* Show when expanded */
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         .tags { margin-top: auto; display: flex; flex-wrap: wrap; gap: 8px; }
         .tag {
@@ -236,214 +196,246 @@
             border: 1px solid rgba(88, 166, 255, 0.2);
         }
 
-        /* --- SKILLS GRID --- */
-        .skills-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: 20px;
-            text-align: center;
-        }
-        .skill-box {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            padding: 20px;
-            border-radius: 12px;
-            transition: transform 0.2s;
-        }
-        .skill-box:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent);
-        }
-        .skill-box i {
-            font-size: 3rem;
-            margin-bottom: 10px;
-            display: block;
-            color: var(--accent);
-        }
-        .skill-name { font-weight: 600; color: var(--text); }
-
-        /* --- CONTACT & FOOTER --- */
-        .contact-box {
-            background: var(--card-bg);
+        /* --- SIDEBAR (DEEP DIVE WINDOW) --- */
+        #project-sidebar {
+            position: fixed;
+            top: 0;
+            right: -600px;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: #1c2128;
+            border-left: 1px solid var(--border);
+            z-index: 200;
             padding: 40px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            text-align: center;
+            transition: right 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+            overflow-y: auto;
         }
+
+        body.sidebar-active #project-sidebar { right: 0; }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 20px;
+        }
+        .sidebar-close {
+            background: none;
+            border: none;
+            color: #8b949e;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+        }
+        .sidebar-close:hover { color: white; }
+        
+        #sidebar-title { font-size: 1.6rem; color: var(--heading); line-height: 1.3; font-weight: 700; }
+        
+        /* Sidebar Description Styling */
+        #sidebar-desc { 
+            font-size: 1rem; 
+            color: #c9d1d9; 
+            margin-bottom: 30px; 
+            line-height: 1.7;
+            white-space: pre-wrap; /* Preserves formatting */
+        }
+
+        /* --- SKILLS (Clean Text Pills - No Icons) --- */
+        .skills-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center; /* Center them */
+        }
+        .skill-item {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 12px 24px;
+            border-radius: 30px; /* Pill shape */
+            font-weight: 600;
+            color: var(--text);
+            transition: all 0.2s;
+        }
+        .skill-item:hover {
+            border-color: var(--accent);
+            color: var(--heading);
+            background-color: rgba(88, 166, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* --- CONTACT (Clean - No Box) --- */
+        #contact {
+            text-align: center;
+            padding-bottom: 40px;
+        }
+        .contact-intro {
+            font-size: 1.2rem;
+            color: #8b949e;
+            margin-bottom: 30px;
+        }
+
+        /* FOOTER */
         footer {
             text-align: center;
             padding: 60px 0;
-            margin-top: 100px;
+            margin-top: 60px;
             border-top: 1px solid var(--border);
             color: #8b949e;
         }
         a { text-decoration: none; color: inherit; }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            :root { --sidebar-width: 100%; }
+            body.sidebar-active .main-wrapper { transform: scale(0.9); }
+        }
     </style>
 </head>
 <body>
 
-    <nav class="animate-load">
-        <div class="nav-container">
-            <div class="nav-logo">Jatin.</div>
-            <div class="nav-links">
-                <a href="#projects">Projects</a>
-                <a href="#skills">Skills</a>
-                <a href="#contact">Contact</a>
-            </div>
+    <div id="project-sidebar">
+        <div class="sidebar-header">
+            <h3 id="sidebar-title">Project Title</h3>
+            <button class="sidebar-close" onclick="closeSidebar()"><i class="fas fa-times"></i></button>
         </div>
-    </nav>
+        <div id="sidebar-content">
+            <div id="sidebar-tags" class="tags" style="margin-bottom: 25px;"></div>
+            <p id="sidebar-desc">Description...</p>
+            <br>
+            <a href="#" id="sidebar-link" target="_blank" class="btn primary">
+                <i class="fab fa-github"></i> View Source Code
+            </a>
+        </div>
+    </div>
 
-    <header id="home">
+    <div class="main-wrapper">
+
+        <nav>
+            <div class="nav-container">
+                <div class="nav-logo">Jatin</div>
+                <div class="nav-links">
+                    <a href="#projects">Projects</a>
+                    <a href="#skills">Skills</a>
+                    <a href="#contact">Contact</a>
+                </div>
+            </div>
+        </nav>
+
+        <header id="home">
+            <div class="container">
+                <h1>Jatin Patidar</h1>
+                <div class="subtitle">AI & Data Engineer</div>
+                <p class="bio">
+                    A results-driven Engineer proficient in the full data lifecycle: SQL for extraction, Python for modeling,
+                    and Cloud Ops for deployment. Passionate about building efficient, scalable, and automated data solutions.
+                </p>
+                <div class="btn-group">
+                    <a href="#" class="btn primary">
+                        <i class="fas fa-file-alt"></i> Download Resume
+                    </a>
+                    <a href="https://github.com/jatin-42" class="btn">
+                        <i class="fab fa-github"></i> GitHub
+                    </a>
+                </div>
+            </div>
+        </header>
+
         <div class="container">
-            <h1 class="animate-load delay-1">Jatin Patidar</h1>
-            <div class="subtitle animate-load delay-1">AI & Data Engineer</div>
-            <p class="bio animate-load delay-2">
-                A results-driven Engineer proficient in the full data lifecycle: SQL for extraction, Python for modeling,
-                and Cloud Ops for deployment. Passionate about building efficient, scalable, and automated data solutions.
-            </p>
-            <div class="btn-group animate-load delay-3">
-                <a href="#" class="btn primary">
-                    <i class="fas fa-file-alt"></i> Download Resume
-                </a>
-                <a href="https://github.com/jatin-42" class="btn">
-                    <i class="fab fa-github"></i> GitHub
-                </a>
-            </div>
-        </div>
-    </header>
+            
+            <section id="projects">
+                <h2>🚀 Featured Engineering Projects</h2>
+                <div class="projects-grid">
+                    
+                    <div class="project-card" onclick="openSidebar(this)"
+                         data-title="End-to-End Digital Music Store Analysis"
+                         data-desc="I simulated a real-world enterprise data environment by containerizing a MySQL database using Docker, ensuring a reproducible local setup. I didn't just run simple Select statements; I engineered complex SQL queries using Common Table Expressions (CTEs), Window Functions, and Recursive Joins to solve business questions.
 
-    <div class="container">
-        
-        <section id="projects" class="animate-load delay-2">
-            <h2>🚀 Featured Engineering Projects</h2>
-            <div class="projects-grid">
-                
-                <div class="project-card" onclick="toggleProject(this)">
-                    <div class="project-title">
-                        End-to-End Digital Music Store Analysis
-                        <i class="fas fa-chevron-down expand-icon"></i>
+Key analyses included calculating Customer Lifetime Value (CLV) to identify VIP clients, mapping sales trends across different global territories, and evaluating employee sales performance hierarchies. This project demonstrates my ability to handle the full database lifecycle—from infrastructure (Docker) to schema design and final business intelligence reporting."
+                         data-link="https://github.com/jatin-42/music-store-sql-analysis"
+                         data-tags="SQL,Docker,Schema Design,BI">
+                        
+                        <div class="project-title">📊 End-to-End Digital Music Store Analysis</div>
+                        <p class="project-preview">Designed and deployed a local data analysis environment using Docker and MySQL. Performed complex SQL queries to extract business insights...</p>
+                        <div class="tags">
+                            <span class="tag">SQL</span>
+                            <span class="tag">Docker</span>
+                            <span class="tag">Schema Design</span>
+                        </div>
                     </div>
-                    <p class="project-desc clamped">
-                        Designed and deployed a local data analysis environment using Docker and MySQL. Performed complex SQL queries (multi-table joins, subqueries, aggregations) to extract business insights regarding customer lifetime value, global sales trends, and employee performance. Documented the full ETL process and analysis workflow via GitHub.
-                    </p>
-                    <div class="tags">
-                        <span class="tag">SQL</span>
-                        <span class="tag">Docker</span>
-                        <span class="tag">Database Schema Design</span>
-                        <span class="tag">Business Intelligence</span>
-                    </div>
-                    <div class="expanded-details">
-                        <a href="https://github.com/jatin-42/music-store-sql-analysis" target="_blank" class="btn primary">View Repos →</a>
-                    </div>
-                </div>
 
-                <div class="project-card" onclick="toggleProject(this)">
-                    <div class="project-title">
-                        End-to-End Churn Prediction
-                        <i class="fas fa-chevron-down expand-icon"></i>
-                    </div>
-                    <p class="project-desc clamped">
-                        A full-stack ML pipeline that predicts customer churn. Features an automated ETL process, model training, and a scalable API deployment using AWS EC2 and Docker.
-                    </p>
-                    <div class="tags">
-                        <span class="tag">Python</span>
-                        <span class="tag">Docker</span>
-                        <span class="tag">AWS</span>
-                        <span class="tag">Machine Learning</span>
-                    </div>
-                    <div class="expanded-details">
-                        <a href="https://github.com/jatin-42/Customer-churn-prediction" target="_blank" class="btn primary">View Code →</a>
-                    </div>
-                </div>
+                    <div class="project-card" onclick="openSidebar(this)"
+                         data-title="End-to-End Churn Prediction"
+                         data-desc="This is a full-stack MLOps project designed to solve a critical business problem: customer retention. Instead of just training a model in a notebook, I built a production-ready pipeline.
 
-                <div class="project-card" onclick="toggleProject(this)">
-                    <div class="project-title">
-                        GCN Image Captioning
-                        <i class="fas fa-chevron-down expand-icon"></i>
+I developed an automated ETL process to clean and preprocess raw customer data. The core model (Random Forest) was trained to predict churn probability with high accuracy. The final solution was containerized with Docker and deployed on an AWS EC2 instance, exposing a REST API that allows the business to get real-time churn scores for any customer."
+                         data-link="https://github.com/jatin-42/Customer-churn-prediction"
+                         data-tags="Python,Docker,AWS,Machine Learning">
+                        
+                        <div class="project-title">🏗️ End-to-End Churn Prediction</div>
+                        <p class="project-preview">A full-stack ML pipeline that predicts customer churn. Features an automated ETL process and scalable API deployment using AWS EC2...</p>
+                        <div class="tags">
+                            <span class="tag">Python</span>
+                            <span class="tag">Docker</span>
+                            <span class="tag">AWS</span>
+                        </div>
                     </div>
-                    <p class="project-desc clamped">
-                        An advanced AI system that generates natural language captions. Uses Graph Neural Networks to understand object relationships (Scene Graphs) + LSTMs for text generation.
-                    </p>
-                    <div class="tags">
-                        <span class="tag">Python</span>
-                        <span class="tag">GCN</span>
-                        <span class="tag">LSTM</span>
-                        <span class="tag">Deep Learning</span>
-                    </div>
-                    <div class="expanded-details">
-                        <a href="https://github.com/jatin-42/image-captioning-gcn-rnn" target="_blank" class="btn primary">View Code →</a>
-                    </div>
-                </div>
 
-                <div class="project-card" onclick="toggleProject(this)">
-                    <div class="project-title">
-                        Data Analysis Portfolio
-                        <i class="fas fa-chevron-down expand-icon"></i>
-                    </div>
-                    <p class="project-desc clamped">
-                        A collection of SQL queries, Python EDA notebooks, and data visualizations demonstrating statistical analysis skills.
-                    </p>
-                    <div class="tags">
-                        <span class="tag">SQL</span>
-                        <span class="tag">Pandas</span>
-                        <span class="tag">Matplotlib</span>
-                        <span class="tag">EDA</span>
-                    </div>
-                    <div class="expanded-details">
-                        <a href="https://github.com/jatin-42/Data-Engineering-Portfolio" target="_blank" class="btn primary">View Repos →</a>
-                    </div>
-                </div>
+                    <div class="project-card" onclick="openSidebar(this)"
+                         data-title="GCN Image Captioning"
+                         data-desc="Standard image captioning models often miss the context between objects. In this project, I moved beyond traditional CNN-RNN architectures by integrating Graph Neural Networks (GCNs).
 
-            </div>
-        </section>
+The system first constructs a 'Scene Graph' to understand the semantic relationships between objects (e.g., distinguishing 'man holding bat' from 'man standing near bat'). These relationship features are then fed into an LSTM decoder to generate linguistically accurate and contextually rich captions. This project highlights my expertise in Deep Learning and PyTorch."
+                         data-link="https://github.com/jatin-42/image-captioning-gcn-rnn"
+                         data-tags="Python,GCN,LSTM,Deep Learning">
+                        
+                        <div class="project-title">🕸️ GCN Image Captioning</div>
+                        <p class="project-preview">An advanced AI system that generates natural language captions. Uses Graph Neural Networks to understand object relationships...</p>
+                        <div class="tags">
+                            <span class="tag">Python</span>
+                            <span class="tag">Deep Learning</span>
+                        </div>
+                    </div>
 
-        <section id="skills">
-            <h2>🛠️ Technical Stack</h2>
-            <div class="skills-grid">
-                <div class="skill-box">
-                    <i class="devicon-python-plain"></i>
-                    <div class="skill-name">Python</div>
-                </div>
-                <div class="skill-box">
-                    <i class="devicon-mysql-plain"></i>
-                    <div class="skill-name">SQL (MySQL)</div>
-                </div>
-                <div class="skill-box">
-                    <i class="devicon-pandas-plain"></i>
-                    <div class="skill-name">Pandas & NumPy</div>
-                </div>
-                <div class="skill-box">
-                    <i class="fas fa-chart-bar"></i>
-                    <div class="skill-name">Matplotlib</div>
-                </div>
-                <div class="skill-box">
-                    <i class="devicon-docker-plain"></i>
-                    <div class="skill-name">Docker</div>
-                </div>
-                <div class="skill-box">
-                    <i class="devicon-git-plain"></i>
-                    <div class="skill-name">Git & GitHub</div>
-                </div>
-                <div class="skill-box">
-                    <i class="fas fa-brain"></i>
-                    <div class="skill-name">Machine Learning</div>
-                </div>
-                <div class="skill-box">
-                    <i class="fas fa-chart-line"></i>
-                    <div class="skill-name">Data Visualization</div>
-                </div>
-                <div class="skill-box">
-                    <i class="fas fa-database"></i>
-                    <div class="skill-name">OOP & DBMS</div>
-                </div>
-            </div>
-        </section>
+                    <div class="project-card" onclick="openSidebar(this)"
+                         data-title="Data Analysis Portfolio"
+                         data-desc="A comprehensive repository demonstrating my core statistical and analytical skills. This collection includes various Exploratory Data Analysis (EDA) notebooks where I clean messy real-world datasets using Pandas, handle missing values, and detect outliers.
 
-        <section id="contact">
-            <h2>📫 Let's Connect</h2>
-            <div class="contact-box">
-                <p>I am currently open to roles in Data Engineering and AI. Feel free to reach out.</p>
-                <div class="btn-group" style="margin-top: 20px;">
+It also features detailed visualizations created with Matplotlib and Seaborn to uncover hidden distribution patterns and correlations. This portfolio serves as a proof-of-work for my ability to turn raw numbers into actionable data stories."
+                         data-link="https://github.com/jatin-42/Data-Engineering-Portfolio"
+                         data-tags="SQL,Pandas,Matplotlib,EDA">
+                        
+                        <div class="project-title">📊 Data Analysis Portfolio</div>
+                        <p class="project-preview">A collection of SQL queries, Python EDA notebooks, and data visualizations demonstrating statistical analysis skills...</p>
+                        <div class="tags">
+                            <span class="tag">SQL</span>
+                            <span class="tag">Pandas</span>
+                            <span class="tag">EDA</span>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <section id="skills">
+                <h2>🛠️ Technical Stack</h2>
+                <div class="skills-list">
+                    <div class="skill-item">Python</div>
+                    <div class="skill-item">SQL (MySQL)</div>
+                    <div class="skill-item">Pandas & NumPy</div>
+                    <div class="skill-item">Matplotlib</div>
+                    <div class="skill-item">Docker</div>
+                    <div class="skill-item">Git & GitHub</div>
+                    <div class="skill-item">Machine Learning</div>
+                    <div class="skill-item">Data Visualization</div>
+                    <div class="skill-item">OOP & DBMS</div>
+                </div>
+            </section>
+
+            <section id="contact">
+                <h2>📫 Let's Connect</h2>
+                <p class="contact-intro">I am currently open to roles in Data Engineering and AI.</p>
+                <div class="btn-group">
                     <a href="mailto:jatinpatidar622@gmail.com" class="btn">
                         <i class="fas fa-envelope"></i> Email Me
                     </a>
@@ -451,27 +443,41 @@
                         <i class="fab fa-linkedin"></i> LinkedIn
                     </a>
                 </div>
-            </div>
-        </section>
+            </section>
+
+        </div>
+
+        <footer>
+            &copy; 2026 Jatin Patidar. Built with pure HTML/CSS.
+        </footer>
 
     </div>
 
-    <footer>
-        &copy; 2026 Jatin Patidar. Built with pure HTML/CSS.
-    </footer>
-
     <script>
-        function toggleProject(card) {
-            // Close any other expanded cards first
-            const allCards = document.querySelectorAll('.project-card');
-            allCards.forEach(c => {
-                if (c !== card) {
-                    c.classList.remove('expanded');
-                }
+        function openSidebar(element) {
+            const title = element.getAttribute('data-title');
+            const desc = element.getAttribute('data-desc');
+            const link = element.getAttribute('data-link');
+            const tags = element.getAttribute('data-tags').split(',');
+
+            document.getElementById('sidebar-title').textContent = title;
+            document.getElementById('sidebar-desc').textContent = desc;
+            document.getElementById('sidebar-link').href = link;
+
+            const tagsContainer = document.getElementById('sidebar-tags');
+            tagsContainer.innerHTML = '';
+            tags.forEach(tag => {
+                const span = document.createElement('span');
+                span.className = 'tag';
+                span.textContent = tag;
+                tagsContainer.appendChild(span);
             });
 
-            // Toggle the clicked card
-            card.classList.toggle('expanded');
+            document.body.classList.add('sidebar-active');
+        }
+
+        function closeSidebar() {
+            document.body.classList.remove('sidebar-active');
         }
     </script>
 
