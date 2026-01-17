@@ -16,13 +16,22 @@ This repository serves as the central hub for my data analysis work. It contains
 
 ---
 
-## 🚀 Featured Projects
+## 🚀 Featured "Big" Projects
 *(These are full-stack engineering projects hosted in separate repositories)*
 
 | Project | Description | Tech Stack |
 | :--- | :--- | :--- |
 | **[🏗️ Churn Prediction Pipeline](https://github.com/jatin-42/Customer-churn-prediction)** | End-to-end ML pipeline with Docker & AWS deployment. | `Docker` `AWS` `Python` |
-| **[🕸️ GCN Image Captioning](https://github.com/jatin-42/image-captioning-gcn-rnn)** | Advanced AI using Graph Neural Networks for image context. | `TensorFlow` `GCN` `LSTM` |
+| **[🕸️ GCN Image Captioning](https://github.com/jatin-42/image-captioning-gcn-rnn)** | Advanced AI using Graph Neural Networks for image context. | `GCN` `LSTM` |
+
+---
+
+## 🛠️ Technical Stack
+
+* **Languages:** Python, SQL (MySQL)
+* **Data Libraries:** Pandas, NumPy, Matplotlib
+* **Tools & Version Control:** Docker, Git, GitHub
+* **Concepts:** Machine Learning, Data Visualization, OOP, DBMS
 
 ---
 
@@ -39,13 +48,6 @@ This repository serves as the central hub for my data analysis work. It contains
 
 ### 📊 Visualization & Dashboards
 * **[PowerBI Dashboard](./dashboards)** - *Interactive view of regional performance metrics.*
-
----
-
-## 🛠️ Technical Stack
-* **Languages:** Python, SQL
-* **Libraries:** Pandas, NumPy, Matplotlib, Seaborn, Scikit-Learn
-* **Tools:** Jupyter Notebook, Excel, PowerBI
 
 ---
 
