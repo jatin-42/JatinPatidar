@@ -17,8 +17,7 @@
             --accent: #58a6ff;
             --card-bg: #161b22;
             --border: #30363d;
-            --nav-bg: rgba(13, 17, 23, 0.85);
-            --sidebar-width: 450px;
+            --sidebar-width: 500px;
         }
         
         * { box-sizing: border-box; }
@@ -31,11 +30,58 @@
             padding: 0;
             line-height: 1.6;
             overflow-x: hidden;
-            
-            /* --- DATA GRID BACKGROUND --- */
-            background-image: linear-gradient(rgba(48, 54, 61, 0.2) 1px, transparent 1px),
-                              linear-gradient(90deg, rgba(48, 54, 61, 0.2) 1px, transparent 1px);
-            background-size: 50px 50px; /* Size of the grid squares */
+            min-height: 100vh;
+        }
+
+        /* --- OPTION 3: STARFIELD BACKGROUND ANIMATION --- */
+        /* This creates 3 layers of stars moving at different speeds */
+        
+        .stars-container {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #0d1117 0%, #05070a 100%);
+        }
+
+        .star {
+            position: absolute;
+            width: 2px; height: 2px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.5;
+            animation: moveUp linear infinite;
+        }
+
+        /* Creating random stars using box-shadow to avoid 100s of divs */
+        /* This is a performance hack for starfields */
+        .stars-1 {
+            width: 1px; height: 1px;
+            background: transparent;
+            box-shadow: 12vw 14vh #fff, 83vw 22vh #fff, 45vw 67vh #fff, 12vw 88vh #fff, 
+                        67vw 12vh #fff, 88vw 88vh #fff, 34vw 45vh #fff, 22vw 12vh #fff,
+                        91vw 34vh #fff, 15vw 72vh #fff, 55vw 22vh #fff, 72vw 45vh #fff,
+                        10vw 90vh #fff, 50vw 50vh #fff, 90vw 10vh #fff;
+            animation: moveStars 100s linear infinite;
+        }
+        .stars-2 {
+            width: 2px; height: 2px;
+            background: transparent;
+            box-shadow: 22vw 34vh #8b949e, 63vw 12vh #8b949e, 15vw 57vh #8b949e, 
+                        72vw 78vh #8b949e, 85vw 22vh #8b949e, 44vw 45vh #8b949e;
+            animation: moveStars 150s linear infinite;
+        }
+        .stars-3 {
+            width: 3px; height: 3px;
+            background: transparent;
+            box-shadow: 12vw 54vh #58a6ff, 53vw 82vh #58a6ff, 85vw 17vh #58a6ff;
+            animation: moveStars 200s linear infinite;
+        }
+
+        @keyframes moveStars {
+            from { transform: translateY(0); }
+            to { transform: translateY(-2000px); }
         }
 
         /* --- MAIN WRAPPER FOR SLIDE EFFECT --- */
@@ -50,14 +96,14 @@
             pointer-events: none;
         }
 
-        /* --- NAVIGATION (SCROLLS AWAY) --- */
+        /* --- NAVIGATION (Absolute = Scrolls Away) --- */
         nav {
-            position: absolute; /* Changed from fixed so it scrolls away */
+            position: absolute; /* Not fixed, so it scrolls away */
             top: 0; left: 0; width: 100%;
-            background: transparent; /* Clean look */
-            border-bottom: 1px solid rgba(48, 54, 61, 0.5);
+            background: transparent;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             z-index: 100;
-            padding: 20px 0;
+            padding: 25px 0;
         }
         .nav-container {
             max-width: 1000px;
@@ -67,10 +113,15 @@
             justify-content: space-between;
             align-items: center;
         }
-        .nav-logo { font-weight: 800; color: var(--heading); font-size: 1.4rem; }
+        .nav-logo { 
+            font-weight: 800; 
+            color: var(--heading); 
+            font-size: 1.5rem;
+            letter-spacing: -0.5px;
+        }
         .nav-links a {
             color: var(--text);
-            margin-left: 25px;
+            margin-left: 30px;
             font-size: 0.95rem;
             font-weight: 500;
             text-decoration: none;
@@ -86,112 +137,118 @@
 
         /* --- HERO SECTION --- */
         header {
-            padding: 180px 0 100px 0;
+            padding: 200px 0 120px 0;
             text-align: center;
-            /* Radial glow to make text pop against the grid */
-            background: radial-gradient(circle at center, rgba(13,17,23,0.8) 0%, rgba(13,17,23,0) 70%);
         }
         h1 {
-            font-size: 3.5rem;
+            font-size: 4rem;
             margin-bottom: 15px;
             color: var(--heading);
             font-weight: 800;
-            letter-spacing: -1px;
+            letter-spacing: -2px;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
         }
         .subtitle {
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             color: var(--accent);
             font-weight: 600;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
         .bio {
             max-width: 700px;
-            margin: 0 auto 35px auto;
-            font-size: 1.1rem;
+            margin: 0 auto 40px auto;
+            font-size: 1.15rem;
             color: #8b949e;
+            line-height: 1.7;
         }
         .btn-group { display: flex; gap: 15px; justify-content: center; }
         .btn {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            background-color: var(--card-bg);
+            gap: 10px;
+            background-color: rgba(22, 27, 34, 0.8);
             color: var(--heading);
             border: 1px solid var(--border);
-            padding: 12px 24px;
+            padding: 14px 28px;
             text-decoration: none;
-            border-radius: 6px;
+            border-radius: 8px;
             font-weight: 600;
             transition: all 0.2s;
             cursor: pointer;
+            backdrop-filter: blur(5px);
         }
-        .btn.primary { background-color: var(--accent); border-color: var(--accent); color: white; }
-        .btn:hover { transform: translateY(-2px); opacity: 0.9; }
+        .btn.primary { 
+            background-color: var(--accent); 
+            border-color: var(--accent); 
+            color: white; 
+            box-shadow: 0 4px 15px rgba(88, 166, 255, 0.3);
+        }
+        .btn:hover { transform: translateY(-3px); }
 
-        /* --- PROJECTS GRID --- */
-        section { margin-top: 100px; }
+        /* --- SECTIONS --- */
+        section { margin-top: 120px; }
         h2 {
             color: var(--heading);
-            border-bottom: 2px solid var(--border);
+            border-bottom: 1px solid var(--border);
             padding-bottom: 15px;
-            margin-bottom: 40px;
-            font-size: 2rem;
+            margin-bottom: 50px;
+            font-size: 2.2rem;
             font-weight: 700;
         }
 
+        /* --- PROJECTS GRID --- */
         .projects-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 25px;
+            gap: 30px;
         }
         
         .project-card {
-            background-color: var(--card-bg);
+            background-color: rgba(22, 27, 34, 0.6); /* Semi-transparent */
             border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 25px;
-            transition: all 0.3s ease;
+            border-radius: 16px;
+            padding: 30px;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             position: relative;
             cursor: pointer;
             display: flex;
             flex-direction: column;
-            min-height: 200px;
+            min-height: 240px;
+            backdrop-filter: blur(5px);
         }
         
         .project-card:hover {
-            transform: translateY(-7px);
+            transform: translateY(-8px);
             border-color: var(--accent);
-            background-color: #1c2128;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            background-color: rgba(28, 33, 40, 0.9);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
         }
 
         .project-title {
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             font-weight: 700;
             color: var(--heading);
             margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
         
         .project-preview {
             color: #c9d1d9;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             display: -webkit-box;
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
-            font-size: 0.95rem;
+            font-size: 1rem;
+            line-height: 1.6;
         }
 
         .tags { margin-top: auto; display: flex; flex-wrap: wrap; gap: 8px; }
         .tag {
             background: rgba(88, 166, 255, 0.1);
             color: var(--accent);
-            padding: 5px 10px;
+            padding: 6px 12px;
             border-radius: 20px;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             font-weight: 600;
             border: 1px solid rgba(88, 166, 255, 0.2);
         }
@@ -203,12 +260,12 @@
             right: -600px;
             width: var(--sidebar-width);
             height: 100vh;
-            background: #1c2128;
+            background: #0d1117;
             border-left: 1px solid var(--border);
             z-index: 200;
-            padding: 40px;
+            padding: 50px;
             transition: right 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-            box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+            box-shadow: -20px 0 50px rgba(0,0,0,0.7);
             overflow-y: auto;
         }
 
@@ -218,50 +275,58 @@
             display: flex;
             justify-content: space-between;
             align-items: start;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
         }
         .sidebar-close {
             background: none;
             border: none;
             color: #8b949e;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             cursor: pointer;
-            padding: 5px;
+            padding: 0;
+            transition: color 0.2s;
         }
-        .sidebar-close:hover { color: white; }
+        .sidebar-close:hover { color: var(--accent); }
         
-        #sidebar-title { font-size: 1.6rem; color: var(--heading); line-height: 1.3; font-weight: 700; }
+        #sidebar-title { 
+            font-size: 1.8rem; 
+            color: var(--heading); 
+            line-height: 1.3; 
+            font-weight: 800; 
+            padding-right: 20px;
+        }
         
-        /* Sidebar Description Styling */
         #sidebar-desc { 
-            font-size: 1rem; 
+            font-size: 1.05rem; 
             color: #c9d1d9; 
-            margin-bottom: 30px; 
-            line-height: 1.7;
-            white-space: pre-wrap; /* Preserves formatting */
+            margin-bottom: 35px; 
+            line-height: 1.8;
+            white-space: pre-wrap; 
         }
 
-        /* --- SKILLS (Clean Text Pills - No Icons) --- */
+        /* --- SKILLS (Clean Text Pills) --- */
         .skills-list {
             display: flex;
             flex-wrap: wrap;
             gap: 15px;
-            justify-content: center; /* Center them */
+            justify-content: center;
         }
         .skill-item {
-            background-color: var(--card-bg);
+            background-color: rgba(22, 27, 34, 0.6);
             border: 1px solid var(--border);
             padding: 12px 24px;
-            border-radius: 30px; /* Pill shape */
+            border-radius: 100px;
             font-weight: 600;
             color: var(--text);
             transition: all 0.2s;
+            cursor: default;
         }
         .skill-item:hover {
             border-color: var(--accent);
             color: var(--heading);
             background-color: rgba(88, 166, 255, 0.1);
-            transform: translateY(-2px);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(88, 166, 255, 0.1);
         }
 
         /* --- CONTACT (Clean - No Box) --- */
@@ -270,18 +335,19 @@
             padding-bottom: 40px;
         }
         .contact-intro {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             color: #8b949e;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
         }
 
-        /* FOOTER */
+        /* --- FOOTER (Minimal) --- */
         footer {
             text-align: center;
-            padding: 60px 0;
-            margin-top: 60px;
+            padding: 50px 0;
+            margin-top: 80px;
             border-top: 1px solid var(--border);
-            color: #8b949e;
+            color: #6e7681;
+            font-size: 0.9rem;
         }
         a { text-decoration: none; color: inherit; }
 
@@ -289,10 +355,18 @@
         @media (max-width: 768px) {
             :root { --sidebar-width: 100%; }
             body.sidebar-active .main-wrapper { transform: scale(0.9); }
+            h1 { font-size: 2.5rem; }
+            .nav-links { display: none; } /* Could add mobile menu later if needed */
         }
     </style>
 </head>
 <body>
+
+    <div class="stars-container">
+        <div class="stars-1"></div>
+        <div class="stars-2"></div>
+        <div class="stars-3"></div>
+    </div>
 
     <div id="project-sidebar">
         <div class="sidebar-header">
@@ -300,10 +374,10 @@
             <button class="sidebar-close" onclick="closeSidebar()"><i class="fas fa-times"></i></button>
         </div>
         <div id="sidebar-content">
-            <div id="sidebar-tags" class="tags" style="margin-bottom: 25px;"></div>
+            <div id="sidebar-tags" class="tags" style="margin-bottom: 30px;"></div>
             <p id="sidebar-desc">Description...</p>
             <br>
-            <a href="#" id="sidebar-link" target="_blank" class="btn primary">
+            <a href="#" id="sidebar-link" target="_blank" class="btn primary" style="width: 100%; justify-content: center;">
                 <i class="fab fa-github"></i> View Source Code
             </a>
         </div>
@@ -331,7 +405,7 @@
                     and Cloud Ops for deployment. Passionate about building efficient, scalable, and automated data solutions.
                 </p>
                 <div class="btn-group">
-                    <a href="#" class="btn primary">
+                    <a href="jatin's resume.pdf" target="_blank" class="btn primary">
                         <i class="fas fa-file-alt"></i> Download Resume
                     </a>
                     <a href="https://github.com/jatin-42" class="btn">
@@ -356,7 +430,7 @@ Key analyses included calculating Customer Lifetime Value (CLV) to identify VIP 
                          data-tags="SQL,Docker,Schema Design,BI">
                         
                         <div class="project-title">📊 End-to-End Digital Music Store Analysis</div>
-                        <p class="project-preview">Designed and deployed a local data analysis environment using Docker and MySQL. Performed complex SQL queries to extract business insights...</p>
+                        <p class="project-preview">Designed and deployed a local data analysis environment using Docker and MySQL. Performed complex SQL queries to extract business insights regarding customer lifetime value...</p>
                         <div class="tags">
                             <span class="tag">SQL</span>
                             <span class="tag">Docker</span>
@@ -373,7 +447,7 @@ I developed an automated ETL process to clean and preprocess raw customer data. 
                          data-tags="Python,Docker,AWS,Machine Learning">
                         
                         <div class="project-title">🏗️ End-to-End Churn Prediction</div>
-                        <p class="project-preview">A full-stack ML pipeline that predicts customer churn. Features an automated ETL process and scalable API deployment using AWS EC2...</p>
+                        <p class="project-preview">A full-stack ML pipeline that predicts customer churn. Features an automated ETL process, model training, and a scalable API deployment using AWS EC2...</p>
                         <div class="tags">
                             <span class="tag">Python</span>
                             <span class="tag">Docker</span>
@@ -448,22 +522,25 @@ It also features detailed visualizations created with Matplotlib and Seaborn to 
         </div>
 
         <footer>
-            &copy; 2026 Jatin Patidar. Built with pure HTML/CSS.
+            &copy; 2026 Jatin Patidar
         </footer>
 
     </div>
 
     <script>
         function openSidebar(element) {
+            // Retrieve data from the clicked card
             const title = element.getAttribute('data-title');
             const desc = element.getAttribute('data-desc');
             const link = element.getAttribute('data-link');
             const tags = element.getAttribute('data-tags').split(',');
 
+            // Inject data into sidebar
             document.getElementById('sidebar-title').textContent = title;
             document.getElementById('sidebar-desc').textContent = desc;
             document.getElementById('sidebar-link').href = link;
 
+            // Generate tags
             const tagsContainer = document.getElementById('sidebar-tags');
             tagsContainer.innerHTML = '';
             tags.forEach(tag => {
@@ -473,6 +550,7 @@ It also features detailed visualizations created with Matplotlib and Seaborn to 
                 tagsContainer.appendChild(span);
             });
 
+            // Show Sidebar
             document.body.classList.add('sidebar-active');
         }
 
